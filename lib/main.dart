@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -33,15 +34,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late File pickedImage;
+  File? _image; // Solved the issue by using ?
+  final picker = ImagePicker();
   bool isImageLoaded = false;
 
-  loadImage() async {
-    var tempStore = await ImagePicker().getImage(source: ImageSource.gallery);
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-      pickedImage = File(tempStore!.path);
-      isImageLoaded = true;
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
     });
   }
 
@@ -52,27 +57,11 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(height: 30),
-            isImageLoaded
-                ? Center(
-                    child: Container(
-                      height: 350,
-                      width: 350,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: FileImage(File(pickedImage.path)),
-                              fit: BoxFit.contain)),
-                    ),
-                  )
-                : Container(),
-          ],
-        ),
+        child:
+            _image == null ? Text('No image selected.') : Image.file(_image!),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: loadImage(),
+        onPressed: getImage,
         child: Icon(Icons.photo),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
