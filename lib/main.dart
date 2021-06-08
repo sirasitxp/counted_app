@@ -50,6 +50,13 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future loadModel() async {
+    var result = await Tflite.loadModel(
+      model: "assets/model_unquant.tflite",
+      labels: "assets/labels.txt",
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,8 +64,12 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child:
-            _image == null ? Text('No image selected.') : Image.file(_image!),
+        child: Container(
+          width: 300,
+          height: 300,
+          child:
+              _image == null ? Text('No image selected.') : Image.file(_image!),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: getImage,
